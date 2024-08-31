@@ -40,14 +40,14 @@ body{
 }
 
 .boton{
-	width: 40%;
+	width: 45%;
 	background: #caa444;
 	height: 50px;
 	border-radius: 20px;
 	border: 1px solid black;
 	transition: .7s;
 	box-shadow: 4px 4px 4px;
-	font-size: 1.7rem;
+	font-size: 1.3rem;
 }
 
 .boton:hover{

@@ -16,6 +16,18 @@ body{
 	margin-top: 30px;
 }
 
+.form{
+	gap: 30px;
+	border: 2px solid #caa444;
+	width: 70%;
+}
+
+.input{
+	border: 1px solid #caa444;
+	width: 90%;
+	height: 30px;
+}
+
 .logo{
 	display: block;
 	max-width: 300px;

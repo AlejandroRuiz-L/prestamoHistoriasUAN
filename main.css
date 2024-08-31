@@ -1,0 +1,43 @@
+*{
+    margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
+
+body{
+    background: #014886;
+}
+
+.contenedor{
+    display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 70px;
+	margin-top: 30px;
+}
+
+.logo{
+	display: block;
+	max-width: 300px;
+	transition: .7s;
+	border-radius: 50px;
+}
+
+.logo:hover{
+    transform: scale(1.1);
+}
+
+.boton{
+	width: 40%;
+	background: #caa444;
+	height: 50px;
+	border-radius: 20px;
+	border: 1px solid black;
+	transition: .7s;
+	box-shadow: 4px 4px 4px;
+	font-size: 1.7rem;
+}
+
+.boton:hover{
+	transform: scale(1.1)
+}

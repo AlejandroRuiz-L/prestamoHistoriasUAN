@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="main.css">
+  <script src="main.js" defer ></script>
+  <title>Historias Clinicas</title>
+</head>
+
+<body>
+  <main class="contenedor">
+    <img src="logoUAN.png" alt="Logo UAN" class="logo">
+	
+	<form class="form" method="POST" action="">
+	
+	  <label for="patient">Nombre del paciente:</label>
+      <input type="text" id="patient" name="patient_name" class="input" placeholder="Nombre completo del paciente" required >
+	  
+	  <label for="patientId">Documento del paciente:</label>
+	  <input type="text" id="patientId" name="patient_id" class="input"
+	    placeholder="Número de documento del paciente" pattern="\d+" title="Debe ser un número" required >
+	  
+	  <label for="student">Nombre del estudiante:</label>
+	  <input type="text" id="student" name="student_name" class="input" placeholder="Nombre completo del estudiante" required >
+	  
+	  <label for="studentId">Documento del estudiante:</label>
+	  <input type="text" id="studentId" name="student_id" class="input"
+	    placeholder="Número de documento del estudiante" pattern="\d+" title="Debe ser un número" required >
+      
+	  <label for="studentCode">Código de estudiante:</label>
+	  <input type="text" id="studentCode" name="student_code" class="input" pattern="\d+" title="Debe ser un número" required >
+	  
+	  <label for="ortopedia">
+        <input type="checkbox" id="ortopedia" name="ortopedia_opcion" >
+      </label>
+	  <div id="divOrtopedia" name="div_ortopedia" style="display: none;" >
+	    <label for="codigoOrtopedia" >Código de ortopedia:</label>
+		<input type="text" id="codigoOrtopedia" name="codigo_ortopedia" class="input" >
+	  </div>
+	  
+      <button type="submit" class="boton">Solicitar historia</button>
+      <button type="reset" class="boton">Limpiar formulario</button>
+    </form>
+  </main>
+</body>
+
+</html>

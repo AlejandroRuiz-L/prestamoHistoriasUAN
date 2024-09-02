@@ -77,7 +77,7 @@ document.querySelector('.form').addEventListener('submit', handleSubmit);
 document.getElementById('ortopedia').addEventListener('change', function() {
   const ortopediaContainer = document.getElementById('divOrtopedia');
   if (this.checked) {
-    ortopediaContainer.style.display = 'block';
+    ortopediaContainer.style.display = 'flex';
   } else {
     ortopediaContainer.style.display = 'none';
   }

@@ -12,20 +12,23 @@ body{
     display: flex;
 	flex-direction: column;
 	align-items: center;
-	gap: 70px;
-	margin-top: 30px;
+	gap: 20px;
 }
 
 .form{
-	gap: 30px;
+	gap: 70px;
+	margin-top: 15px;
 	border: 2px solid #caa444;
-	width: 70%;
+	width: 60%;
+	border-radius: 20px;
 }
 
 .input{
 	border: 1px solid #caa444;
 	width: 90%;
 	height: 30px;
+	text-align: center;
+	border-radius: 20px;
 }
 
 .logo{

@@ -195,13 +195,19 @@ function toggleOrtopedia() {
     }
 }
 
-// Función para establecer la fecha y hora actuales
+// Función para obtener la hora del servidor
 async function getServerTime() {
     const getTime = httpsCallable(functions, 'getServerTime');
-    const result = await getTime();
-    return result.data.time; // Asegúrate de que la Cloud Function devuelva un campo `time`
+    try {
+        const result = await getTime();
+        return result.data.time; // Asegúrate de que la Cloud Function devuelva un campo `time`
+    } catch (error) {
+        console.error('Error al obtener la hora del servidor:', error);
+        throw error;
+    }
 }
 
+// Función para establecer la fecha y hora actuales
 async function setCurrentDateTime() {
     try {
         const serverTime = await getServerTime();
@@ -226,7 +232,7 @@ async function setCurrentDateTime() {
     }
 }
 
-// Asignar el manejador al formulario
+// Asignar el manejador al formulario y otros eventos
 document.addEventListener('DOMContentLoaded', function() {
     document.querySelector('.form').addEventListener('submit', handleSubmit);
     document.getElementById('ortopedia').addEventListener('change', toggleOrtopedia);

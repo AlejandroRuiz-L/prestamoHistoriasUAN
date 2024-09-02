@@ -28,6 +28,7 @@ body{
 	gap: 20px;
 	width: 90%;
 	margin: 0 auto;
+	font-size: 1.3rem;
 }
 
 .form{
@@ -49,6 +50,7 @@ body{
 	width: 100%;
 	text-align: center;
 	border-radius: 20px;
+	font-size: 1.2rem;
 }
 
 .logo{
@@ -75,4 +77,10 @@ body{
 
 .boton:hover{
 	transform: scale(1.1)
+}
+
+@media (max-width: 768px){
+	.form{
+		width: 95%;
+	}
 }

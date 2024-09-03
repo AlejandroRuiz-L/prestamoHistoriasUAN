@@ -162,7 +162,7 @@ async function handleSubmit(event) {
 
     try {
         // Definir la ruta del documento en Firestore
-        const docRef = doc(db, studentId, patientId);
+        const docRef = doc(db, String(studentId), String(patientId));
 
         // Crear un objeto con los datos a enviar
         const data = {

@@ -1,7 +1,7 @@
 /*
 // Importar las funciones necesarias desde Firebase SDK
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.19.1/firebase-app.js";
-import { getFirestore, collection, doc, setDoc } from "https://www.gstatic.com/firebasejs/9.19.1/firebase-firestore.js";
+import { getFirestore, collection, doc, setDoc, getDoc, updateDoc, arrayUnion, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.19.1/firebase-firestore.js";
 
 // Configuración de Firebase (reemplaza con tu configuración real)
 const firebaseConfig = {

@@ -112,8 +112,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Importar las funciones necesarias desde Firebase SDK
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.19.1/firebase-app.js";
-import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/9.19.1/firebase-firestore.js";
-import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/9.19.1/firebase-functions.js";
+import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.19.1/firebase-firestore.js";
+import { getFunctions } from "https://www.gstatic.com/firebasejs/9.19.1/firebase-functions.js";
 
 // Configuración de Firebase (reemplaza con tu configuración real)
 const firebaseConfig = {
@@ -146,8 +146,8 @@ async function handleSubmit(event) {
     const studentCode = parseInt(studentCodeText, 10);
     const ortopediaCodeText = document.getElementById('codigoOrtopedia').value.trim();
     const ortopediaCode = ortopediaCodeText ? parseInt(ortopediaCodeText, 10) : null;
-    const fecha = document.getElementById('fecha').value;
-    const hora = document.getElementById('hora').value;
+    //const fecha = document.getElementById('fecha').value;
+    //const hora = document.getElementById('hora').value;
 
     // Validar los datos
     if (!patientName || isNaN(patientId) || !studentName || isNaN(studentId) || isNaN(studentCode)) {
@@ -162,16 +162,16 @@ async function handleSubmit(event) {
 
     try {
         // Definir la ruta del documento en Firestore
-        const docRef = doc(db, 'prestamos', fecha, hora);
+        const docRef = doc(db, studentId, createdAt: serverTimestamp());
 
         // Crear un objeto con los datos a enviar
         const data = {
             patientName,
             patientId,
             studentName,
-            studentId,
             studentCode,
-            ortopediaCode
+            ortopediaCode,
+            updatedAt: serverTimestamp()  // Fecha y hora del servidor al crear
         };
 
         // Enviar los datos a Firebase Firestore
@@ -195,46 +195,8 @@ function toggleOrtopedia() {
     }
 }
 
-// Función para obtener la hora del servidor
-async function getServerTime() {
-    const getTime = httpsCallable(functions, 'getServerTime');
-    try {
-        const result = await getTime();
-        return result.data.time; // Asegúrate de que la Cloud Function devuelva un campo `time`
-    } catch (error) {
-        console.error('Error al obtener la hora del servidor:', error);
-        throw error;
-    }
-}
-
-// Función para establecer la fecha y hora actuales
-async function setCurrentDateTime() {
-    try {
-        const serverTime = await getServerTime();
-        const now = new Date(serverTime);
-        // Formatear y establecer la fecha y hora actuales
-        const year = now.getFullYear();
-        const month = String(now.getMonth() + 1).padStart(2, '0');
-        const day = String(now.getDate()).padStart(2, '0');
-        const formattedDate = `${year}-${month}-${day}`;
-
-        const hours = String(now.getHours()).padStart(2, '0');
-        const minutes = String(now.getMinutes()).padStart(2, '0');
-        const seconds = String(now.getSeconds()).padStart(2, '0');
-        const formattedTime = `${hours}:${minutes}:${seconds}`;
-
-        document.getElementById('fecha').value = formattedDate;
-        document.getElementById('hora').value = formattedTime;
-        document.getElementById('fecha').disabled = true;
-        document.getElementById('hora').disabled = true;
-    } catch (error) {
-        console.error('Error al obtener la hora del servidor:', error);
-    }
-}
-
 // Asignar el manejador al formulario y otros eventos
 document.addEventListener('DOMContentLoaded', function() {
     document.querySelector('.form').addEventListener('submit', handleSubmit);
     document.getElementById('ortopedia').addEventListener('change', toggleOrtopedia);
-    setCurrentDateTime();
 });

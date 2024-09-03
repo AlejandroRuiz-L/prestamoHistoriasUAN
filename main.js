@@ -162,16 +162,15 @@ async function handleSubmit(event) {
 
     try {
         // Definir la ruta del documento en Firestore
-        const docRef = doc(db, studentId, createdAt: serverTimestamp());
+        const docRef = doc(db, studentId, patientId);
 
         // Crear un objeto con los datos a enviar
         const data = {
-            patientName,
-            patientId,
-            studentName,
-            studentCode,
-            ortopediaCode,
-            updatedAt: serverTimestamp()  // Fecha y hora del servidor al crear
+            patient: {patientName, patientId},
+            student: {studentName, estudentId, studentCode},
+            ortopedia: ortopediaCode,
+			createdAt: serverTimestamp(), // Fecha y hora del servidor al crear
+            updatedAt: [].push(serverTimestamp())
         };
 
         // Enviar los datos a Firebase Firestore

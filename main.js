@@ -197,7 +197,7 @@ async function handleSubmit(event) {
                 patient: { patientName, patientId, ortopediaCode },
                 student: { studentName, studentId, studentCode },
                 createdAt: serverTimestamp(),
-                updateAt: [serverTimestamp()]
+                updateAt: arrayUnion(serverTimestamp())
             };
 
             await setDoc(docRef, data);

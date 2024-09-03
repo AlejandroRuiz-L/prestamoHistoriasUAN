@@ -160,7 +160,7 @@ async function handleSubmit(event) {
         return;
     }
 
-    try {
+    /*try {
         // Definir la ruta del documento en Firestore
         const docRef = doc(db, studentId, patientId);
 
@@ -177,6 +177,32 @@ async function handleSubmit(event) {
         await setDoc(docRef, data);
 
         alert('Formulario enviado con éxito!');
+    } catch (e) {
+        console.error("Error al enviar el formulario: ", e);
+        alert('Hubo un problema al enviar el formulario. Inténtalo de nuevo.');
+    }
+}*/
+    try {
+        const docRef = doc(db, String(studentId), String(patientId));
+
+        const docSnapshot = await getDoc(docRef);
+
+        if (docSnapshot.exists()) {
+            await updateDoc(docRef, {
+                updateAt: arrayUnion(serverTimestamp())
+            });
+            alert('Solicitud actualizada exitosamente!');
+        } else {
+            const data = {
+                patient: { patientName, patientId, ortopediaCode },
+                student: { studentName, studentId, studentCode },
+                createdAt: serverTimestamp(),
+                updateAt: [serverTimestamp()]
+            };
+
+            await setDoc(docRef, data);
+            alert('Solicitud enviada con éxito!');
+        }
     } catch (e) {
         console.error("Error al enviar el formulario: ", e);
         alert('Hubo un problema al enviar el formulario. Inténtalo de nuevo.');

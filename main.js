@@ -48,7 +48,7 @@ async function handleSubmit(event) {
 
     try {
 		//referencia a la collecion y documento 
-        const docRef = doc(db, 'solicitudes', String(studentId));
+        const docRef = doc(db, String(studentId), String(patientId));
 
         const docSnapshot = await getDoc(docRef);
 		

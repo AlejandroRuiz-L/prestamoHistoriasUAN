@@ -5,6 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="main.css">
+  <script type="module" src="login.js" defer ></script>
   <title>Historias Clinicas</title>
 </head>
 
@@ -12,10 +13,22 @@
   <main>
     <header class="contenedor">
     <img src="logoUAN.png" alt="Logo UAN" class="logo">
-	<br><br>
-    <button class="boton"><a href="prestamo.html">Soliciar préstamo</a></button>
 	<br>
-    <button class="boton">Historial de prestamos</button>
+	<p>Por favor, ingresa tus datos para consultar tus historias disponibles.</p>
+	<form action="prestamo.html" method="POST" class="form">
+	
+	  <div class="contenedor">
+	  <label for="studentId">Identificación del estudiante:</label>
+	  <input type="text" id="studentId" name="student_id" class="input" pattern="\d+" title="Debe ser un número" required >
+      </div>
+            
+      <div class="contenedor">
+	  <label for="studentCode">Código de estudiante:</label>
+	  <input type="text" id="studentCode" name="student_code" class="input" pattern="\d+" title="Debe ser un número" required >
+	  </div>
+	  
+      <button class="boton" type="submit">Consultar</button>
+    </form>
 </header>
   </main>
 </body>

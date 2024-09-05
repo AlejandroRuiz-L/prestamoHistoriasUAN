@@ -19,6 +19,64 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const functions = getFunctions(app);
 
+// Función para obtener parámetros de la URL
+    function getQueryParams() {
+      const params = new URLSearchParams(window.location.search);
+      return {
+        studentId: params.get('studentId'),
+        studentCode: params.get('studentCode')
+      };
+    }
+
+    // Función para mostrar la información del préstamo
+    async function mostrarInformacion() {
+      const { studentId, studentCode } = getQueryParams();
+	  
+	  console.log('studentId:', studentId);
+      console.log('studentCode:', studentCode);
+      
+      if (!studentId || !studentCode) {
+        document.getElementById('info').textContent = 'Faltan datos para mostrar la información.';
+        return;
+      }
+
+      try {
+        // Construir la referencia al documento en Firestore
+        const docRef = doc(db, String(studentId), String(studentCode));
+        
+        // Obtener el documento
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+          // Mostrar la información del documento
+		  const data = docSnap.data()
+		  
+		  let html = '<h2>Historias del estudiante</h2>';
+		  
+		  for (const [key, value] of Object.entries(data.student)){
+			  html += `<p><strong>${key}:</strong> ${value}</p>`;
+		  }
+		  
+		  for (const [key, value] of Object.entries(data.patient)) {
+              html += `<p><strong>${key}:</strong> ${value !== null ? value : 'No disponible'}</p>`;
+          }
+		  
+		  document.getElementById('info').innerHTML = html;
+		  
+        } else {
+          // Datos no válidos
+          document.getElementById('info').textContent = 'No se encontró información para estos datos.';
+        }
+      } catch (error) {
+        console.error('Error al obtener el documento:', error);
+        document.getElementById('info').textContent = 'Error al obtener la información.';
+      }
+    }
+
+    // Esperar a que el documento esté listo y luego ejecutar la función
+    document.addEventListener('DOMContentLoaded', mostrarInformacion);
+
+/*
 // Función para manejar el envío del formulario
 async function handleSubmit(event) {
     event.preventDefault(); // Evitar el envío por defecto del formulario
@@ -91,3 +149,4 @@ document.addEventListener('DOMContentLoaded', function() {
     document.querySelector('.form').addEventListener('submit', handleSubmit);
     document.getElementById('ortopedia').addEventListener('change', toggleOrtopedia);
 });
+*/

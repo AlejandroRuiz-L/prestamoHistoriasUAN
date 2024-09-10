@@ -1,6 +1,6 @@
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js';
 import { getAuth, signInWithPopup, signOut, onAuthStateChanged, GoogleAuthProvider } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js';
-import { getFirestore, doc, getDoc, setDoc } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js';
+import { getFirestore, doc, getDoc, setDoc, updateDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js';
 
 // Configura Firebase
 const firebaseConfig = {
@@ -30,7 +30,7 @@ document.getElementById('submit-number').addEventListener('click', () => {
                 document.getElementById('login').style.display = 'block'; // Mostrar botón de login
                 localStorage.setItem('userNumber', userNumber); // Guardar el número en localStorage
             } else {
-                alert('Number not found. Please check and enter a valid number.');
+                alert('Número no encontrado. Por favor ingrese un núnero válido.');
             }
         }).catch((error) => {
             console.error('Error checking document:', error);
@@ -47,6 +47,9 @@ document.getElementById('login').addEventListener('click', () => {
         .then((result) => {
             const user = result.user;
             console.log('User:', user);
+			
+			//asignacion de correo en campo oculto
+			document.getElementById('correo').value = user.email
 
             // Recupera el número de usuario del almacenamiento local
             const userNumber = localStorage.getItem('userNumber');
@@ -119,11 +122,15 @@ function updateUI(isAuthenticated, uid = null) {
                     if (docSnap.exists()) {
                         const userData = docSnap.data();
 						const userDataText = document.getElementById('user-data');
+						const estudiante = document.getElementById('estudiante');
+						const codigo = document.getElementById('codigo');
+						codigo.value = userNumber;
+						const correo = document.getElementById('correo');
 						for (const [key, value] of Object.entries(userData)) {
 							let div = document.createElement('div');
 							let input_check = document.createElement('input');
 							input_check.type = 'checkbox';
-							input_check.id = `paciente${key}`;
+							input_check.id = `${key}`;
 							input_check.value = `${key}`;
 							const label = document.createElement('label');
 							label.htmlFor = `paciente${key}`;
@@ -133,9 +140,10 @@ function updateUI(isAuthenticated, uid = null) {
                             output += `Documento: ${key}\n`;
                             output += `Paciente: ${value.nombrePaciente || 'N/A'}\n`;
                             output += `Estudiante: ${value.nombreEstudiante || 'N/A'}\n`;
+							estudiante.value = value.nombreEstudiante;
                             output += `Código Estudiante: ${value.codigoEstudiante || 'N/A'}\n`;
 							output += `Código Ortopedia: ${value.codigoOrtopedia || 'N/A'}\n`;
-							div.classList.add('form');
+							div.classList.add('historias');
 							texto.textContent = output;
 							div.appendChild(texto);
 							div.appendChild(label);
@@ -158,3 +166,44 @@ function updateUI(isAuthenticated, uid = null) {
         document.getElementById('protected-content').style.display = 'none';
     }
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+    const form = document.getElementById('historiaForm');
+
+    form.addEventListener('submit', async (event) => {
+        event.preventDefault(); // Evita que el formulario se envíe de manera predeterminada
+
+        // Recoge todos los checkboxes seleccionados
+        const selectedCheckboxes = Array.from(form.querySelectorAll('input[type="checkbox"]:checked'));
+        const selectedValues = selectedCheckboxes.map(checkbox => checkbox.value);
+		const student = document.getElementById('estudiante').value;
+		const codigo = document.getElementById('codigo').value;
+		const correo = document.getElementById('correo').value;
+
+        // Configura los datos a enviar
+        const dataToSend = {
+			[correo]:{
+    			estudiante: student,
+                solicitados: selectedValues,
+                timestamp: serverTimestamp()
+		    }
+        };
+
+        try {
+            // Envía los datos a Firestore
+			const docRef = doc(db, 'solicitudes', codigo);
+			const docRefSnap = await getDoc(docRef);
+			
+			if (docRefSnap.exists()){
+				await setDoc(docRef, dataToSend, {merge:true});
+				alert('Solicitud actualizada exitosamente');
+			}else{
+    			await setDoc(docRef, dataToSend);
+    			alert('Solicitud creada exitosamente');
+			}
+		} catch (error) {
+            console.error('Error al enviar datos:', error);
+            alert('Hubo un problema al solicitar las historias.');
+        }
+    });
+});

@@ -128,6 +128,7 @@ function updateUI(isAuthenticated, uid = null) {
 						const correo = document.getElementById('correo');
 						for (const [key, value] of Object.entries(userData)) {
 							let div = document.createElement('div');
+							let div_input = document.createElement('div');
 							let input_check = document.createElement('input');
 							input_check.type = 'checkbox';
 							input_check.id = `${key}`;
@@ -135,6 +136,8 @@ function updateUI(isAuthenticated, uid = null) {
 							const label = document.createElement('label');
 							label.htmlFor = `paciente${key}`;
 							label.textContent = 'Seleccionar historia:';
+							div_input.appendChild(label);
+							div_input.appendChild(input_check);
 							let texto = document.createElement('p');
 							let output = '';
                             output += `Documento: ${key}\n`;
@@ -143,11 +146,11 @@ function updateUI(isAuthenticated, uid = null) {
 							estudiante.value = value.nombreEstudiante;
                             output += `Código Estudiante: ${value.codigoEstudiante || 'N/A'}\n`;
 							output += `Código Ortopedia: ${value.codigoOrtopedia || 'N/A'}\n`;
-							div.classList.add('historias');
+							div.classList.add('contenido');
+							div.classList.add('background');
 							texto.textContent = output;
 							div.appendChild(texto);
-							div.appendChild(label);
-							div.appendChild(input_check);
+							div.appendChild(div_input);
                             userDataText.appendChild(div);
 						}
                     } else {

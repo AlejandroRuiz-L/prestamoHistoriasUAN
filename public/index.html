@@ -14,7 +14,7 @@
   <h2>Préstamo de historias clínicas</h2>
 
   <!-- Formulario para ingresar el número de usuario -->
-  <div id="number-form" class="form">
+  <div id="number-form" class="contenido background-hidden">
     <label for="user-number" class="label">Código de estudiante:</label>
     <input type="text" id="user-number" class="input">
     <button id="submit-number" class="boton">Consultar código</button>
@@ -25,12 +25,11 @@
   </div>
   <button id="logout" style="display: none;" class="boton">Cerrar Sesión</button>
   <!-- Contenido protegido -->
-  <div id="protected-content" class="contenedor">
+  <div id="protected-content" class="contenido">
     <h3>Historias clínicas encontradas</h3>
 	<br>
-	<form id="historiaForm">
-      <pre id="user-data" class="historias">Loading...</pre>
-	  <br>
+	<form id="historiaForm" class="contenido b-hidden background-hidden">
+      <pre id="user-data" class="historias background-hidden"></pre>
 	  <input type="hidden" id="estudiante" >
 	  <input type="hidden" id="codigo" >
 	  <input type="hidden" id="correo" >

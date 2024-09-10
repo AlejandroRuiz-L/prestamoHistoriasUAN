@@ -16,11 +16,14 @@ a:visited{
 	color: black;
 }
 
-
 body{
     background: #014886;
 	margin-top: 40px;
 	margin-bottom: 40px;
+}
+
+h3{
+	margin-top: 10px;
 }
 
 #protected-content {
@@ -34,24 +37,40 @@ body{
 	align-items: center;
 	justify-content: center;
 	gap: 20px;
-	width: 90%;
+	width: 85%;
 	margin: 0 auto;
 	font-size: 1.3rem;
 	text-align: center;
 }
 
-.form{
-    display: flex;
-	flex-direction: column;
+.contenido{
+	display: flex;
 	align-items: center;
-	justify-content: center;
-	gap: 70px;
-	margin-top: 15px;
+	flex-direction: column;
 	border: 2px solid #caa444;
-	width: 85%;
+	gap: 30px;
+	width: 100%;
 	border-radius: 20px;
-	padding: 20px 20px;
-	margin: 30px 30px;
+}
+
+.historias{
+	display: grid;
+	gap: 20px;
+	grid-template-columns: 1fr 1fr;
+	width: 98%;
+}
+
+.b-hidden{
+	border: none;
+}
+
+.background{
+	background: linear-gradient(45deg, #8a6225, #dfbd59);
+	border: 1px solid black;
+}
+
+.background:hover{
+	background: linear-gradient(10deg, #8a6225, #dfbd59);
 }
 
 .label{
@@ -85,7 +104,7 @@ body{
 
 .boton{
 	width: 40%;
-	background: #caa444;
+	background: linear-gradient(45deg, #8a6225, #dfbd59);/*#caa444;*/
 	height: 55px;
 	border-radius: 20px;
 	border: 1px solid black;
@@ -93,38 +112,43 @@ body{
 	box-shadow: 4px 4px 4px;
 	font-size: 1.3rem;
 	display: block;
+	text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
 	margin: 20px auto;
 }
 
 .boton:hover{
-	transform: scale(1.1)
+	transform: scale(1.1);
+	background: linear-gradient(10deg, #8a6225, #dfbd59);
 }
 
-.historias{
-	display: flex;
-	align-items: center;
-	flex-direction: column;
-	border: 2px solid #caa444;
+@media (min-width: 1200px){
+	.historias{
+		grid-template-columns: repeat(3, 1fr);
+	}
 }
 
 @media (max-width: 768px){
-	.form{
-		width: 95%;
-	}
-	
 	.boton{
 		width: 35%;
+	}
+	
+	.historias{
+		grid-template-columns: 1fr;
+	}
+	
+	.contenedor{
+		width: 90%;
 	}
 }
 
 @media (max-width: 400px){
 	.contenedor{
 		font-size: 1.1rem;
-		width: 95%;
+		width: 100%;
 	}
 	
-    .form{
-		width: 100%;
+	.contenido{
+		width: 98%;
 	}
 	
 	.boton{

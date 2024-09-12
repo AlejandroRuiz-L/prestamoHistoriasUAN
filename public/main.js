@@ -1,6 +1,6 @@
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js';
 import { getAuth, signInWithPopup, signOut, onAuthStateChanged, GoogleAuthProvider } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js';
-import { getFirestore, doc, getDoc, setDoc, updateDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js';
+import { getFirestore, doc, getDoc, setDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js';
 
 // Configura Firebase
 const firebaseConfig = {
@@ -30,7 +30,7 @@ document.getElementById('submit-number').addEventListener('click', () => {
                 document.getElementById('login').style.display = 'block'; // Mostrar botón de login
                 localStorage.setItem('userNumber', userNumber); // Guardar el número en localStorage
             } else {
-                alert('Número no encontrado. Por favor ingrese un núnero válido.');
+                alert('Número no encontrado. Por favor ingrese un número válido.');
             }
         }).catch((error) => {
             console.error('Error checking document:', error);
@@ -46,41 +46,37 @@ document.getElementById('login').addEventListener('click', () => {
     signInWithPopup(auth, provider)
         .then((result) => {
             const user = result.user;
-            console.log('User:', user);
-			
-			//asignacion de correo en campo oculto
-			document.getElementById('correo').value = user.email
+            document.getElementById('correo').value = user.email;
+            const docRef = doc(db, 'users', localStorage.getItem('userNumber'));
 
-            // Recupera el número de usuario del almacenamiento local
-            const userNumber = localStorage.getItem('userNumber');
-            
-            if (userNumber) {
-                // Solo actualiza el documento si el número existe
-                const userDocRef = doc(db, 'users', user.uid);
-                getDoc(userDocRef).then((docSnap) => {
-                    if (docSnap.exists()) {
-                        // Actualiza el campo `userNumber` en el documento del usuario
-                        setDoc(userDocRef, { userNumber }, { merge: true })
-                            .then(() => {
-                                console.log('User number updated in Firestore');
-                                updateUI(true, user.uid);
-                            })
-                            .catch((error) => {
-                                console.error('Error updating document:', error);
-                            });
+            // Verifica si el documento del usuario existe y si el correo coincide antes de hacer la consulta
+            getDoc(docRef).then((docSnap) => {
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    if (data.correo === user.email) {
+                        // Actualiza la UI después del inicio de sesión
+                        updateUI(true);
                     } else {
-                        console.error('User document does not exist.');
+                        // Cierra la sesión y limpia localStorage antes de mostrar el alert
+                        signOut(auth).then(() => {
+                            localStorage.clear();
+                            updateUI(false);
+                            alert('Datos incorrectos. Las historias no te corresponden!');
+                        }).catch((error) => {
+                            console.error('Error during sign-out:', error.message);
+                        });
                     }
-                }).catch((error) => {
-                    console.error('Error getting user document:', error);
-                });
-
-                // Limpia el número de usuario del almacenamiento local
-                localStorage.removeItem('userNumber');
-            }
+                } else {
+                    // Maneja el caso en el que el documento no existe
+                    alert('Número no encontrado. Por favor ingrese un número válido.');
+                }
+            }).catch((error) => {
+                console.error('Error getting document:', error);
+                alert("Se produjo un error al consultar los datos.");
+            });
         })
         .catch((error) => {
-            console.error('Error:', error.message);
+            console.error('Error during sign-in:', error.message);
         });
 });
 
@@ -88,8 +84,9 @@ document.getElementById('login').addEventListener('click', () => {
 document.getElementById('logout').addEventListener('click', () => {
     signOut(auth)
         .then(() => {
-            console.log('User signed out');
+            localStorage.clear(); // Limpiar todo el almacenamiento local
             updateUI(false);
+            console.log('User signed out');
         })
         .catch((error) => {
             console.error('Error:', error.message);
@@ -99,60 +96,64 @@ document.getElementById('logout').addEventListener('click', () => {
 // Observa el estado de autenticación
 onAuthStateChanged(auth, (user) => {
     if (user) {
-        updateUI(true, user.uid);
+        updateUI(true);
     } else {
         updateUI(false);
     }
 });
 
 // Actualiza la UI en función del estado de autenticación
-function updateUI(isAuthenticated, uid = null) {
+function updateUI(isAuthenticated) {
     if (isAuthenticated) {
         document.getElementById('number-form').style.display = 'none';
         document.getElementById('login').style.display = 'none';
         document.getElementById('logout').style.display = 'block';
         document.getElementById('protected-content').style.display = 'block';
         
-        if (uid) {
-            // Obtener y mostrar datos del usuario
+        // Obtener y mostrar datos del usuario
+        const user = auth.currentUser;
+        if (user) {
             const userNumber = localStorage.getItem('userNumber');
             if (userNumber) {
                 const userDocRef = doc(db, 'users', userNumber);
                 getDoc(userDocRef).then((docSnap) => {
                     if (docSnap.exists()) {
                         const userData = docSnap.data();
-						const userDataText = document.getElementById('user-data');
-						const estudiante = document.getElementById('estudiante');
-						const codigo = document.getElementById('codigo');
-						codigo.value = userNumber;
-						const correo = document.getElementById('correo');
-						for (const [key, value] of Object.entries(userData)) {
-							let div = document.createElement('div');
-							let div_input = document.createElement('div');
-							let input_check = document.createElement('input');
-							input_check.type = 'checkbox';
-							input_check.id = `${key}`;
-							input_check.value = `${key}`;
-							const label = document.createElement('label');
-							label.htmlFor = `paciente${key}`;
-							label.textContent = 'Seleccionar historia:';
-							div_input.appendChild(label);
-							div_input.appendChild(input_check);
-							let texto = document.createElement('p');
-							let output = '';
+                        const userDataText = document.getElementById('user-data');
+                        const estudiante = document.getElementById('estudiante');
+                        const codigo = document.getElementById('codigo');
+                        codigo.value = userNumber;
+
+                        // Limpiar contenido previo
+                        userDataText.innerHTML = '';
+
+                        for (const [key, value] of Object.entries(userData)) {
+                            let div = document.createElement('div');
+                            let div_input = document.createElement('div');
+                            let input_check = document.createElement('input');
+                            input_check.type = 'checkbox';
+                            input_check.id = `${key}`;
+                            input_check.value = `${key}`;
+                            const label = document.createElement('label');
+                            label.htmlFor = `${key}`;
+                            label.textContent = 'Seleccionar historia:';
+                            div_input.appendChild(label);
+                            div_input.appendChild(input_check);
+                            let texto = document.createElement('p');
+                            let output = '';
                             output += `Documento: ${key}\n`;
                             output += `Paciente: ${value.nombrePaciente || 'N/A'}\n`;
                             output += `Estudiante: ${value.nombreEstudiante || 'N/A'}\n`;
-							estudiante.value = value.nombreEstudiante;
+                            estudiante.value = value.nombreEstudiante || '';
                             output += `Código Estudiante: ${value.codigoEstudiante || 'N/A'}\n`;
-							output += `Código Ortopedia: ${value.codigoOrtopedia || 'N/A'}\n`;
-							div.classList.add('contenido');
-							div.classList.add('background');
-							texto.textContent = output;
-							div.appendChild(texto);
-							div.appendChild(div_input);
+                            output += `Código Ortopedia: ${value.codigoOrtopedia || 'N/A'}\n`;
+                            div.classList.add('contenido');
+                            div.classList.add('background');
+                            texto.textContent = output;
+                            div.appendChild(texto);
+                            div.appendChild(div_input);
                             userDataText.appendChild(div);
-						}
+                        }
                     } else {
                         document.getElementById('user-data').textContent = 'No data available for this number.';
                     }
@@ -179,32 +180,32 @@ document.addEventListener('DOMContentLoaded', () => {
         // Recoge todos los checkboxes seleccionados
         const selectedCheckboxes = Array.from(form.querySelectorAll('input[type="checkbox"]:checked'));
         const selectedValues = selectedCheckboxes.map(checkbox => checkbox.value);
-		const student = document.getElementById('estudiante').value;
-		const codigo = document.getElementById('codigo').value;
-		const correo = document.getElementById('correo').value;
+        const student = document.getElementById('estudiante').value;
+        const codigo = document.getElementById('codigo').value;
+        const correo = document.getElementById('correo').value;
 
         // Configura los datos a enviar
         const dataToSend = {
-			[correo]:{
-    			estudiante: student,
+            [correo]: {
+                estudiante: student,
                 solicitados: selectedValues,
                 timestamp: serverTimestamp()
-		    }
+            }
         };
 
         try {
             // Envía los datos a Firestore
-			const docRef = doc(db, 'solicitudes', codigo);
-			const docRefSnap = await getDoc(docRef);
-			
-			if (docRefSnap.exists()){
-				await setDoc(docRef, dataToSend, {merge:true});
-				alert('Solicitud actualizada exitosamente');
-			}else{
-    			await setDoc(docRef, dataToSend);
-    			alert('Solicitud creada exitosamente');
-			}
-		} catch (error) {
+            const docRef = doc(db, 'solicitudes', codigo);
+            const docRefSnap = await getDoc(docRef);
+            
+            if (docRefSnap.exists()) {
+                await setDoc(docRef, dataToSend, { merge: true });
+                alert('Solicitud actualizada exitosamente');
+            } else {
+                await setDoc(docRef, dataToSend);
+                alert('Solicitud creada exitosamente');
+            }
+        } catch (error) {
             console.error('Error al enviar datos:', error);
             alert('Hubo un problema al solicitar las historias.');
         }

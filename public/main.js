@@ -53,19 +53,19 @@ document.getElementById('login').addEventListener('click', () => {
             getDoc(docRef).then((docSnap) => {
                 if (docSnap.exists()) {
                     const data = docSnap.data();
-                    if (data.correo === user.email) {
-						localStorage.setItem('estudiante', data.estudiante);//guardar el nombre del estudiante
-                        // Actualiza la UI después del inicio de sesión
-                        updateUI(true);
-                    } else {
-                        // Cierra la sesión y limpia localStorage antes de mostrar el alert
+                    if (!data.correo === user.email || data.sanciones > 2) {
+						// Cierra la sesión y limpia localStorage antes de mostrar el alert
                         signOut(auth).then(() => {
                             localStorage.clear();
                             updateUI(false);
-                            alert('Datos incorrectos. Las historias no te corresponden!');
+                            alert('Datos incorrectos o demasiadas sanciones. Sesión finalizada!');
                         }).catch((error) => {
                             console.error('Error during sign-out:', error.message);
                         });
+                    } else {
+                        localStorage.setItem('estudiante', data.estudiante);//guardar el nombre del estudiante
+                        // Actualiza la UI después del inicio de sesión
+                        updateUI(true);
                     }
                 } else {
                     // Maneja el caso en el que el documento no existe

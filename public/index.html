@@ -26,13 +26,10 @@
   <button id="logout" style="display: none;" class="boton">Cerrar Sesión</button>
   <!-- Contenido protegido -->
   <div id="protected-content" class="contenido">
-    <h3>Historias clínicas encontradas</h3>
+    <h2 id="bienvenida"></h2>
 	<br>
 	<form id="historiaForm" class="contenido b-hidden background-hidden">
-      <pre id="user-data" class="historias background-hidden"></pre>
-	  <input type="hidden" id="estudiante" >
-	  <input type="hidden" id="codigo" >
-	  <input type="hidden" id="correo" >
+      <pre id="user-data" class="contenido b-hidden background-hidden">Cargando historias...</pre>
 	  <button type="submit" class="boton">Solicitar historias</button>
     </form>
   </div>

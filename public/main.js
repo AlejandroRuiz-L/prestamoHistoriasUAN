@@ -24,11 +24,11 @@ document.getElementById('submit-number').addEventListener('click', () => {
     const userNumber = document.getElementById('user-number').value.trim();
     if (userNumber) {
         // Verifica si el número ingresado existe en Firestore
-        const numberDocRef = doc(db, 'users', userNumber);
+        const numberDocRef = doc(db, 'historias', userNumber);
         getDoc(numberDocRef).then((docSnap) => {
             if (docSnap.exists()) {
                 document.getElementById('login').style.display = 'block'; // Mostrar botón de login
-                localStorage.setItem('userNumber', userNumber); // Guardar el número en localStorage
+                localStorage.setItem('userNumber', userNumber); // Guardar el número en almacenamiento local
             } else {
                 alert('Número no encontrado. Por favor ingrese un número válido.');
             }
@@ -46,14 +46,15 @@ document.getElementById('login').addEventListener('click', () => {
     signInWithPopup(auth, provider)
         .then((result) => {
             const user = result.user;
-            document.getElementById('correo').value = user.email;
-            const docRef = doc(db, 'users', localStorage.getItem('userNumber'));
+            localStorage.setItem('correo', user.email);//guardar el correo en almacenamiento local
+            const docRef = doc(db, 'historias', localStorage.getItem('userNumber'));
 
             // Verifica si el documento del usuario existe y si el correo coincide antes de hacer la consulta
             getDoc(docRef).then((docSnap) => {
                 if (docSnap.exists()) {
                     const data = docSnap.data();
                     if (data.correo === user.email) {
+						localStorage.setItem('estudiante', data.estudiante);//guardar el nombre del estudiante
                         // Actualiza la UI después del inicio de sesión
                         updateUI(true);
                     } else {
@@ -115,45 +116,56 @@ function updateUI(isAuthenticated) {
         if (user) {
             const userNumber = localStorage.getItem('userNumber');
             if (userNumber) {
-                const userDocRef = doc(db, 'users', userNumber);
+                const userDocRef = doc(db, 'historias', userNumber);
                 getDoc(userDocRef).then((docSnap) => {
                     if (docSnap.exists()) {
                         const userData = docSnap.data();
+						let title_b = document.querySelector('#bienvenida');//obtiene la bienvenida
                         const userDataText = document.getElementById('user-data');
-                        const estudiante = document.getElementById('estudiante');
-                        const codigo = document.getElementById('codigo');
-                        codigo.value = userNumber;
-
-                        // Limpiar contenido previo
-                        userDataText.innerHTML = '';
-
-                        for (const [key, value] of Object.entries(userData)) {
-                            let div = document.createElement('div');
-                            let div_input = document.createElement('div');
-                            let input_check = document.createElement('input');
-                            input_check.type = 'checkbox';
-                            input_check.id = `${key}`;
-                            input_check.value = `${key}`;
-                            const label = document.createElement('label');
-                            label.htmlFor = `${key}`;
-                            label.textContent = 'Seleccionar historia:';
-                            div_input.appendChild(label);
-                            div_input.appendChild(input_check);
-                            let texto = document.createElement('p');
-                            let output = '';
-                            output += `Documento: ${key}\n`;
-                            output += `Paciente: ${value.nombrePaciente || 'N/A'}\n`;
-                            output += `Estudiante: ${value.nombreEstudiante || 'N/A'}\n`;
-                            estudiante.value = value.nombreEstudiante || '';
-                            output += `Código Estudiante: ${value.codigoEstudiante || 'N/A'}\n`;
-                            output += `Código Ortopedia: ${value.codigoOrtopedia || 'N/A'}\n`;
-                            div.classList.add('contenido');
-                            div.classList.add('background');
-                            texto.textContent = output;
-                            div.appendChild(texto);
-                            div.appendChild(div_input);
-                            userDataText.appendChild(div);
-                        }
+                        userDataText.innerHTML = '';// Limpiar contenido previo
+						
+						
+					    for (const [k, val] of Object.entries(userData)) {
+							title_b.textContent = `Bienvenido ${userData.estudiante}`;//agrega nombre de estudiante a la bienvenida
+							let div_clinica = document.createElement('div');//div principal(titulo-divHistoria)
+							let title_clinica = document.createElement('h3');
+							let title_clinicaText = '';
+							let div_historia = document.createElement('div');
+							
+							if(typeof val === 'object'){
+								for (const [key, value] of Object.entries(val)) {
+									let historia = document.createElement('p');
+							        let historia_text = '';
+									let input_select = document.createElement('select');
+									input_select.id = 'hora';
+									let horarios = [
+									    {value: "7am"},
+										{},
+										{}
+									];
+									let input_check = document.createElement('input');
+									input_check.type = 'checkbox';
+									input_check.id = `paciente${k}`;
+									input_check.value = key;
+									let label = document.createElement('label');
+									label.htmlFor = `paciente${key}`;
+									label.textContent = "Seleccionar historia: ";
+									title_clinicaText = `Clínica de ${key}`;
+									historia_text = `Documento: ${key}\nPaciente: ${value.paciente}\n`;
+									historia.textContent = historia_text;
+									historia.classList.add('background');
+									historia.appendChild(label);
+									historia.appendChild(input_check);
+									div_historia.appendChild(historia);
+								    console.log(k, key, value.paciente);
+								}
+								title_clinica.textContent = title_clinicaText;
+								div_historia.classList.add('historias');
+								div_clinica.appendChild(title_clinica);
+								div_clinica.appendChild(div_historia);
+								userDataText.appendChild(div_clinica);
+							}
+						}
                     } else {
                         document.getElementById('user-data').textContent = 'No data available for this number.';
                     }
@@ -180,17 +192,15 @@ document.addEventListener('DOMContentLoaded', () => {
         // Recoge todos los checkboxes seleccionados
         const selectedCheckboxes = Array.from(form.querySelectorAll('input[type="checkbox"]:checked'));
         const selectedValues = selectedCheckboxes.map(checkbox => checkbox.value);
-        const student = document.getElementById('estudiante').value;
-        const codigo = document.getElementById('codigo').value;
-        const correo = document.getElementById('correo').value;
+        const student = localStorage.getItem('estudiante');
+        const codigo = localStorage.getItem('userNumber');
+        const correo = localStorage.getItem('correo');
 
         // Configura los datos a enviar
         const dataToSend = {
-            [correo]: {
-                estudiante: student,
-                solicitados: selectedValues,
-                timestamp: serverTimestamp()
-            }
+			estudiante: student,
+            solicitados: selectedValues,
+            timestamp: serverTimestamp()
         };
 
         try {

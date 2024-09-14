@@ -124,6 +124,17 @@ function updateUI(isAuthenticated) {
                         const userDataText = document.getElementById('user-data');
                         userDataText.innerHTML = '';// Limpiar contenido previo
 						
+						function showSelect(inputId, selectId){//maneja el display del select
+							document.getElementById(inputId).addEventListener('change', function(){
+								let selectHidden = document.getElementById(selectId);
+								if (this.checked){
+									selectHidden.style.display = 'block';
+								} else {
+									selectHidden.style.display = 'none';
+								}
+							});
+						}
+						
 						
 					    for (const [k, val] of Object.entries(userData)) {
 							title_b.textContent = `Bienvenido ${userData.estudiante}`;//agrega nombre de estudiante a la bienvenida
@@ -137,7 +148,7 @@ function updateUI(isAuthenticated) {
 									let historia = document.createElement('p');
 							        let historia_text = '';
 									let input_select = document.createElement('select');
-									input_select.id = 'hora';
+									input_select.id = `hora${k}${key}`;
 									let horarios = [
 									    {value: "7am"},
 										{},
@@ -145,18 +156,20 @@ function updateUI(isAuthenticated) {
 									];
 									let input_check = document.createElement('input');
 									input_check.type = 'checkbox';
-									input_check.id = `paciente${k}`;
+									input_check.id = `${k}${key}`;
 									input_check.value = key;
 									let label = document.createElement('label');
-									label.htmlFor = `paciente${key}`;
+									label.htmlFor = `${k}${key}`;
 									label.textContent = "Seleccionar historia: ";
-									title_clinicaText = `Clínica de ${key}`;
+									title_clinicaText = `Clínica de ${k}`;
 									historia_text = `Documento: ${key}\nPaciente: ${value.paciente}\n`;
 									historia.textContent = historia_text;
 									historia.classList.add('background');
 									historia.appendChild(label);
 									historia.appendChild(input_check);
+									historia.appendChild(input_select);
 									div_historia.appendChild(historia);
+									//showSelect(input_check.id, input_select.id);
 								    console.log(k, key, value.paciente);
 								}
 								title_clinica.textContent = title_clinicaText;

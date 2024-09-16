@@ -1,5 +1,5 @@
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js';
-import { getAuth, signInWithPopup, signOut, onAuthStateChanged, GoogleAuthProvider, getIdToken, signInWithCustomToken } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js';
+import { getAuth, signInWithPopup, signInWithRedirect, signOut, onAuthStateChanged, GoogleAuthProvider, getIdToken, signInWithCustomToken } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js';
 import { getFirestore, doc, getDoc, setDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js';
 /*
 // Configura Firebase
@@ -313,6 +313,8 @@ document.getElementById('submit-number').addEventListener('click', () => {
 document.getElementById('login').addEventListener('click', async () => {
     try {
         const result = await signInWithPopup(auth1, provider);
+		// Inicia sesión en el segundo proyecto
+        await signInWithPopup(auth2, provider);
         const user = result.user;
         localStorage.setItem('correo', user.email); // Guardar el correo en almacenamiento local
 
@@ -333,9 +335,6 @@ document.getElementById('login').addEventListener('click', async () => {
                 
                 // Actualiza la UI después del inicio de sesión en el primer proyecto
                 updateUI(true);
-
-                // Inicia sesión en el segundo proyecto con el token del primer proyecto
-                await signInToApp2(user);
             }
         } else {
             alert('Número no encontrado. Por favor ingrese un número válido.');
@@ -344,18 +343,6 @@ document.getElementById('login').addEventListener('click', async () => {
         console.error('Error during sign-in:', error.message);
     }
 });
-
-// Función para iniciar sesión en el segundo proyecto con el token del primer proyecto
-async function signInToApp2(user) {
-    try {
-        // Usa el token de acceso del primer proyecto para iniciar sesión en el segundo
-        const token = await user.getIdToken();
-        await signInWithCustomToken(auth2, token);
-        console.log('User signed in to app2');
-    } catch (error) {
-        console.error('Error signing in to app2:', error.message);
-    }
-}
 
 // Maneja el cierre de sesión
 document.getElementById('logout').addEventListener('click', () => {
@@ -436,9 +423,26 @@ function updateUI(isAuthenticated) {
                                 for (const [key, value] of Object.entries(val)) {
                                     let historia = document.createElement('p');
                                     let historia_text = '';
+									let div_select = document.createElement('div');
                                     let input_select = document.createElement('select');
                                     input_select.id = `hora${k}${key}`;
-                                    
+									input_select.classList.add('input');
+                                    if (k === 'adultos'){
+										opt_adultos.forEach(opt => {
+											let optElement = document.createElement('option');
+											optElement.value = opt.value;
+											optElement.textContent = opt.opText;
+											input_select.appendChild(optElement);
+										});
+									} else {
+										opt_ninos.forEach(opt => {
+											let optElement = document.createElement('option');
+											optElement.value = opt.value;
+											optElement.textContent = opt.opText;
+											input_select.appendChild(optElement);
+											
+										});
+									}
                                     let input_check = document.createElement('input');
                                     input_check.type = 'checkbox';
                                     input_check.id = `${k}${key}`;
@@ -454,7 +458,8 @@ function updateUI(isAuthenticated) {
                                     historia.classList.add('background');
                                     historia.appendChild(label);
                                     historia.appendChild(input_check);
-                                    historia.appendChild(input_select);
+									div_select.appendChild(input_select);
+                                    historia.appendChild(div_select);
                                     div_historia.appendChild(historia);
                                 }
                                 title_clinica.textContent = title_clinicaText;

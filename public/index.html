@@ -10,18 +10,17 @@
   <main class="contenedor">
   <img class="logo" src="logoUAN.png" alt="Logo UAN" >
   <h2>Préstamo de historias clínicas</h2>
+  
+  <!-- Botones para inicio y cierre de sesión -->
+  <button id="logout" style="display: none;" class="boton">Cerrar Sesión</button>
 
   <!-- Formulario para ingresar el número de usuario -->
   <div id="number-form" class="contenido background-hidden">
     <label for="user-number" class="label">Código de estudiante:</label>
     <input type="text" id="user-number" class="input">
-    <button id="submit-number" class="boton">Consultar código</button>
-
-  
-  <!-- Botones para inicio y cierre de sesión -->
-  <button id="login" style="display: none;" class="boton">Ingresar</button>
+    <button id="login" class="boton">Ingresar</button>
   </div>
-  <button id="logout" style="display: none;" class="boton">Cerrar Sesión</button>
+
   <!-- Contenido protegido -->
   <div id="protected-content" class="protected-content contenido">
     <h2 id="bienvenida"></h2>
